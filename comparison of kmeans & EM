@@ -1,0 +1,47 @@
+import pandas as pd
+import numpy as np
+from sklearn import datasets
+iris=datasets.load_iris()
+instances=pd.DataFrame(iris.data)
+targets=pd.DataFrame(iris.target)
+
+instances.columns=['sepal_length','sepal_width','petal_length','petal_width']
+targets.columns=['targetss']
+
+from sklearn.cluster import KMeans
+model=KMeans(n_clusters=3)
+model.fit(instances)
+
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10,10))
+colormap=np.array(['red','lime','black'])
+
+plt.subplot(2,2,1)
+plt.scatter(instances.petal_length,instances.petal_width,c=colormap[targets.targetss],s=40)
+plt.title("real clusters")
+plt.xlabel("petal length")
+plt.ylabel("petal width")
+
+plt.subplot(2,2,2)
+plt.scatter(instances.petal_length,instances.petal_width,c=colormap[model.labels_],s=40)
+plt.title("kmeans")
+plt.xlabel("petal length")
+plt.ylabel("petal width")
+
+from sklearn import preprocessing
+scaler=preprocessing.StandardScaler()
+scaler.fit(instances)
+sm=scaler.transform(instances)
+sdf=pd.DataFrame(sm,columns=instances.columns)
+
+from sklearn.mixture import GaussianMixture
+gmob=GaussianMixture(n_components=3)
+gmob.fit(sdf)
+gmpred=gmob.predict(sdf)
+
+plt.subplot(2,2,3)
+plt.scatter(instances.petal_length,instances.petal_width,c=colormap[gmpred],s=40)
+plt.title("gmm clustering")
+plt.xlabel("petal length")
+plt.ylabel("petal width")
+print("gmm using em algo matched the true labels more closely than kmeans")
